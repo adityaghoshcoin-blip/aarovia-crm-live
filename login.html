@@ -409,6 +409,29 @@ function sendReset(){
   showScreen('screen-login');
 }
 
+function enableSecurityGuards(){
+  document.addEventListener('contextmenu', (event)=>{
+    event.preventDefault();
+  }, { passive: false });
+
+  document.addEventListener('keydown', (event)=>{
+    const key = event.key.toLowerCase();
+    const ctrlOrMeta = event.ctrlKey || event.metaKey;
+    const blockedKeys = ['u','s','p','j','c','x','v','a'];
+
+    if(event.key === 'F12' || event.key === 'PrintScreen' || event.shiftKey && event.key === 'F10'){
+      event.preventDefault();
+      return;
+    }
+
+    if(ctrlOrMeta && blockedKeys.includes(key)){
+      event.preventDefault();
+    }
+  }, { passive: false });
+}
+
+enableSecurityGuards();
+
 if(getStoredSession()){
   window.location.href='index.html';
 }
