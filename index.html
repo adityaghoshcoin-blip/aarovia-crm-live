@@ -248,9 +248,64 @@ textarea.form-input{resize:vertical;min-height:80px}
 /* Kanban drag */
 .pipe-card.dragging{opacity:.5}
 .pipeline-col.drag-over{border-color:var(--accent)}
+
+/* Layout helpers */
+.properties-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.dashboard-layout,.dashboard-bottom-grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;margin-bottom:20px}
+.dashboard-side-stack{display:flex;flex-direction:column;gap:14px}
+.wa-layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:0;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;height:calc(100vh - 130px)}
+.wa-sidebar{border-right:1px solid var(--border);display:flex;flex-direction:column;min-height:0}
+.form-help{font-size:11px;color:var(--text3);margin-top:6px;line-height:1.5}
+.mobile-menu-btn{display:none;align-items:center;justify-content:center;width:36px;height:36px;border-radius:var(--radius-sm);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;flex-shrink:0}
+#sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:999}
+
+@media (max-width: 1100px){
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .properties-grid{grid-template-columns:repeat(2,1fr)}
+  .dashboard-layout,.dashboard-bottom-grid{grid-template-columns:1fr}
+}
+
+@media (max-width: 900px){
+  body{overflow-x:hidden;overflow-y:auto}
+  #sidebar{display:none}
+  #sidebar.mobile-open{display:flex;position:fixed;left:0;top:0;bottom:0;width:min(85vw,320px);z-index:1000;box-shadow:0 20px 35px rgba(0,0,0,.35)}
+  #sidebar-overlay.mobile-visible{display:block}
+  #main{height:auto;min-height:100vh}
+  .mobile-menu-btn{display:inline-flex}
+  .topbar{padding:12px 16px;flex-wrap:wrap;gap:10px}
+  .topbar-actions{width:100%;justify-content:flex-start;flex-wrap:wrap}
+  .topbar-actions .search-bar{width:100%;max-width:none}
+  .topbar-actions .btn,.topbar-actions .notif-btn{width:100%;justify-content:center}
+  .page-content{padding:16px}
+  .form-row,.form-row3{grid-template-columns:1fr}
+  .modal{width:min(96vw,680px)}
+  .wa-layout{grid-template-columns:1fr;height:auto}
+  .wa-sidebar{border-right:none;border-bottom:1px solid var(--border)}
+  #wa-contact-list{max-height:280px}
+  .filter-bar{align-items:stretch;gap:8px}
+  .filter-bar .search-bar,.filter-bar select,.filter-bar button,.filter-bar span{width:100%;margin-left:0!important}
+  .filter-bar .btn{justify-content:center}
+  .card-title{flex-direction:column;align-items:flex-start;gap:8px}
+}
+
+@media (max-width: 640px){
+  .stats-grid,.properties-grid{grid-template-columns:1fr}
+  .page-content{padding:12px}
+  .topbar-title{font-size:15px}
+  .topbar-sub{font-size:11px}
+  .topbar-actions{gap:6px}
+  .search-bar{max-width:none}
+  .filter-bar{align-items:stretch}
+  .card,.modal-body{padding:14px}
+  .crm-table th,.crm-table td{font-size:12px;padding:10px 8px}
+  .wa-msg{max-width:100%}
+  .modal{width:98vw}
+}
 </style>
 </head>
 <body>
+
+<div id="sidebar-overlay" onclick="closeMobileSidebar()"></div>
 
 <!-- Sidebar -->
 <div id="sidebar">
@@ -293,6 +348,9 @@ textarea.form-input{resize:vertical;min-height:80px}
 <!-- Main -->
 <div id="main">
   <div class="topbar" id="topbar">
+    <button class="mobile-menu-btn" id="mobile-menu-btn" onclick="toggleMobileSidebar()" aria-label="Toggle navigation menu">
+      <i class="fa-solid fa-bars"></i>
+    </button>
     <div style="flex:1">
       <div class="topbar-title" id="page-title">Dashboard</div>
       <div id="page-sub" class="topbar-sub">Sunday, 25 May 2026 · Welcome back, Admin</div>
@@ -339,7 +397,7 @@ textarea.form-input{resize:vertical;min-height:80px}
         </div>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 320px;gap:16px;margin-bottom:20px">
+      <div class="dashboard-layout">
         <!-- Recent Leads -->
         <div class="card">
           <div class="card-title">Recent Leads <button class="btn btn-sm btn-ghost" onclick="showPage('leads',document.querySelectorAll('.nav-item')[1])">View all →</button></div>
@@ -351,7 +409,7 @@ textarea.form-input{resize:vertical;min-height:80px}
           </div>
         </div>
         <!-- Lead Sources -->
-        <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="dashboard-side-stack">
           <div class="card">
             <div class="card-title">Lead Sources</div>
             <div id="source-bars"></div>
@@ -364,7 +422,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       </div>
 
       <!-- Pipeline Mini + Activity -->
-      <div style="display:grid;grid-template-columns:1fr 320px;gap:16px">
+      <div class="dashboard-bottom-grid">
         <div class="card">
           <div class="card-title">Pipeline by Stage</div>
           <div id="dash-pipeline-chart"></div>
@@ -457,8 +515,8 @@ textarea.form-input{resize:vertical;min-height:80px}
 
     <!-- WHATSAPP PAGE -->
     <div class="page" id="page-whatsapp">
-      <div style="display:grid;grid-template-columns:280px 1fr;gap:0;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;height:calc(100vh - 130px)">
-        <div style="border-right:1px solid var(--border);display:flex;flex-direction:column">
+      <div class="wa-layout">
+        <div class="wa-sidebar">
           <div style="padding:12px;border-bottom:1px solid var(--border)">
             <div class="search-bar"><i class="fa-solid fa-search"></i><input type="text" placeholder="Search chats..."></div>
           </div>
@@ -495,7 +553,7 @@ textarea.form-input{resize:vertical;min-height:80px}
         </select>
         <button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="openAddProperty()"><i class="fa-solid fa-plus"></i> Add Property</button>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px" id="properties-grid"></div>
+      <div class="properties-grid" id="properties-grid"></div>
     </div>
 
     <!-- REPORTS PAGE -->
@@ -604,7 +662,7 @@ const followupsDB = leadsDB.slice(0,15).map((l,i)=>({
   executive:rnd(EXECUTIVES), status:i<3?'overdue':i<8?'today':'upcoming', done:false
 }));
 
-const propertiesDB=[
+let propertiesDB=[
   {id:'P001',name:'Aarovia Heights',type:'Apartment',location:'Anna Nagar, Chennai',config:'2BHK / 3BHK / 4BHK',price:'₹85L – ₹1.8Cr',status:'Active',units:120,available:45,builder:'Aarovia Constructions',amenities:'Swimming Pool, Gym, Clubhouse, 24/7 Security',description:'Premium luxury apartments in the heart of Anna Nagar'},
   {id:'P002',name:'Aarovia Villas',type:'Villa',location:'ECR, Chennai',config:'3BHK / 4BHK',price:'₹1.5Cr – ₹3.2Cr',status:'Active',units:48,available:12,builder:'Aarovia Constructions',amenities:'Private Pool, Smart Home, Landscaped Garden',description:'Exclusive beachside villa community on ECR'},
   {id:'P003',name:'Aarovia Plots',type:'Plot',location:'Tambaram, Chennai',config:'600-2400 sqft',price:'₹25L – ₹1.2Cr',status:'Active',units:200,available:88,builder:'Aarovia Constructions',amenities:'Gated Community, 24/7 Security, Paved Roads',description:'Premium plotted development near Tambaram'},
@@ -711,6 +769,7 @@ function logout(){
 // ==================== NAVIGATION ====================
 function showPage(page, navEl) {
   if(!ensureAuthenticated()) return;
+  closeMobileSidebar();
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+page).classList.add('active');
@@ -725,6 +784,26 @@ function showPage(page, navEl) {
   }
   pageLoaders[page]&&pageLoaders[page]();
 }
+
+function toggleMobileSidebar(){
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  const isOpen = sidebar.classList.toggle('mobile-open');
+  overlay.classList.toggle('mobile-visible', isOpen);
+}
+
+function closeMobileSidebar(){
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  sidebar.classList.remove('mobile-open');
+  overlay.classList.remove('mobile-visible');
+}
+
+window.addEventListener('resize', ()=>{
+  if(window.innerWidth > 900){
+    closeMobileSidebar();
+  }
+});
 
 const pageLoaders={
   dashboard:loadDashboard,
@@ -1355,11 +1434,91 @@ function insertTemplate(msg){document.getElementById('wa-input').value=msg}
 function openSendQuotationWA(){showToast('Opening quotation for WhatsApp...','info')}
 
 // ==================== PROPERTIES ====================
+function getPropertyTypeIcon(type){
+  const icons={Apartment:'🏢',Villa:'🏡',Plot:'🌿',Commercial:'🏬'};
+  return icons[type] || '🏠';
+}
+
+function getPropertyImageMarkup(p){
+  if(p.image){
+    return `<img src="${p.image}" alt="${p.name}" style="width:100%;height:130px;object-fit:cover;border-radius:8px;background:var(--bg3)">`;
+  }
+  return `<div style="background:var(--bg3);border-radius:8px;height:130px;display:flex;align-items:center;justify-content:center;font-size:40px">${getPropertyTypeIcon(p.type)}</div>`;
+}
+
+function getPropertyPreviewMarkup(image, fallbackType='Apartment', name='Property image'){
+  if(image){
+    return `<img id="pf-preview" src="${image}" alt="${name}" style="width:100%;height:180px;object-fit:cover;border-radius:8px;background:var(--bg3)">`;
+  }
+  return `<div id="pf-preview" style="background:var(--bg3);border-radius:8px;height:180px;display:flex;align-items:center;justify-content:center;font-size:46px;margin-bottom:10px">${getPropertyTypeIcon(fallbackType)}</div>`;
+}
+
+function getAddPropertyPreviewMarkup(){
+  return `<div id="add-pf-preview" style="background:var(--bg3);border-radius:8px;height:180px;display:flex;align-items:center;justify-content:center;font-size:46px;margin-bottom:10px">🏠</div>`;
+}
+
+function handlePropertyImageUpload(input, options={}){
+  const file = input.files && input.files[0];
+  if(!file){
+    return;
+  }
+
+  const isAllowedType = ['image/png','image/jpeg','image/svg+xml','image/webp','image/avif'].includes(file.type);
+  const isAllowedName = /\.(png|jpe?g|svg|webp|avif)$/i.test(file.name);
+  if(!isAllowedType && !isAllowedName){
+    showToast('Image must be png, jpg, svg, webp, or avif','error');
+    input.value='';
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    const hidden = document.getElementById(options.hiddenId || 'pf-image-value');
+    const removeFlag = document.getElementById(options.removeId || 'pf-image-remove');
+    const preview = document.getElementById(options.previewId || 'pf-preview');
+    hidden.value = String(reader.result || '');
+    removeFlag.value = '0';
+    if(preview){
+      preview.outerHTML = `<img id="${options.previewId || 'pf-preview'}" src="${reader.result}" alt="Property image" style="width:100%;height:180px;object-fit:cover;border-radius:8px;background:var(--bg3)">`;
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearPropertyImagePreview(options={}){
+  const hidden = document.getElementById(options.hiddenId || 'pf-image-value');
+  const removeFlag = document.getElementById(options.removeId || 'pf-image-remove');
+  const fileInput = document.getElementById(options.fileId || 'pf-image-file');
+  const preview = document.getElementById(options.previewId || 'pf-preview');
+  if(hidden) hidden.value='';
+  if(removeFlag) removeFlag.value='1';
+  if(fileInput) fileInput.value='';
+  if(preview){
+    const fallback = options.fallbackType || 'Apartment';
+    preview.outerHTML = `<div id="${options.previewId || 'pf-preview'}" style="background:var(--bg3);border-radius:8px;height:180px;display:flex;align-items:center;justify-content:center;font-size:46px;margin-bottom:10px">${getPropertyTypeIcon(fallback)}</div>`;
+  }
+}
+
+function isValidPropertyImage(image){
+  if(!image) return true;
+  const value = image.trim();
+  if(!value) return true;
+  const dataMatch = value.match(/^data:image\/([^;]+);/i);
+  if(dataMatch){
+    return ['svg+xml','png','jpeg','jpg','webp','avif'].includes(dataMatch[1].toLowerCase());
+  }
+  return /\.(png|jpg|jpeg|svg|webp|avif)(\?.*)?$/i.test(value);
+}
+
 function renderProperties(){
   document.getElementById('properties-grid').innerHTML=propertiesDB.map(p=>`
     <div class="card" style="cursor:pointer" onclick="viewProperty('${p.id}')">
-      <div style="background:var(--bg3);border-radius:8px;height:130px;display:flex;align-items:center;justify-content:center;margin:-18px -18px 14px;border-radius:var(--radius) var(--radius) 0 0;font-size:40px">
-        ${{Apartment:'🏢',Villa:'🏡',Plot:'🌿',Commercial:'🏬'}[p.type]||'🏠'}
+      <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start;margin-bottom:10px">
+        <div style="flex:1;overflow:hidden">${getPropertyImageMarkup(p)}</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn btn-ghost btn-sm" style="padding:8px 10px" onclick="event.stopPropagation(); openEditProperty('${p.id}')" title="Edit"><i class="fa-solid fa-pen"></i></button>
+          <button class="btn btn-ghost btn-sm" style="padding:8px 10px;color:var(--red)" onclick="event.stopPropagation(); deleteProperty('${p.id}')" title="Delete"><i class="fa-solid fa-trash"></i></button>
+        </div>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
         <div style="font-size:14px;font-weight:600">${p.name}</div>
@@ -1379,10 +1538,32 @@ function renderProperties(){
     </div>`).join('');
 }
 
+function propertyFormHTML(p={}){
+  const preview = getPropertyPreviewMarkup(p.image, p.type, p.name || 'Property image');
+  return `
+    ${preview}
+    <div class="form-group">
+      <label class="form-label">Property Image</label>
+      <input id="pf-image-file" type="file" class="form-input" accept=".png,.jpg,.jpeg,.svg,.webp,.avif,image/png,image/jpeg,image/svg+xml,image/webp,image/avif" onchange="handlePropertyImageUpload(this, {previewId:'pf-preview', hiddenId:'pf-image-value', removeId:'pf-image-remove', fileId:'pf-image-file'})">
+      <div class="form-help">Upload PNG, JPG, SVG, WEBP, or AVIF. Existing image stays unless you replace it.</div>
+      <input type="hidden" id="pf-image-value" value="${p.image||''}">
+      <input type="hidden" id="pf-image-remove" value="0">
+    </div>
+    ${p.image ? `<div class="form-group"><button type="button" class="btn btn-ghost btn-sm" onclick="clearPropertyImagePreview({previewId:'pf-preview', hiddenId:'pf-image-value', removeId:'pf-image-remove', fileId:'pf-image-file', fallbackType:'${p.type||'Apartment'}'})">Remove image</button></div>` : ''}
+    <div class="form-row"><div class="form-group"><label class="form-label">Property Name</label><input id="pf-name" class="form-input" value="${p.name||''}"></div><div class="form-group"><label class="form-label">Type</label><select id="pf-type" class="form-input"><option ${p.type==='Apartment'?'selected':''}>Apartment</option><option ${p.type==='Villa'?'selected':''}>Villa</option><option ${p.type==='Plot'?'selected':''}>Plot</option><option ${p.type==='Commercial'?'selected':''}>Commercial</option></select></div></div>
+    <div class="form-group"><label class="form-label">Location</label><input id="pf-location" class="form-input" value="${p.location||''}"></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Configuration</label><input id="pf-config" class="form-input" value="${p.config||''}"></div><div class="form-group"><label class="form-label">Price Range</label><input id="pf-price" class="form-input" value="${p.price||''}"></div></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Status</label><select id="pf-status" class="form-input"><option ${p.status==='Active'?'selected':''}>Active</option><option ${p.status==='Upcoming'?'selected':''}>Upcoming</option><option ${p.status==='Inactive'?'selected':''}>Inactive</option></select></div><div class="form-group"><label class="form-label">Builder</label><input id="pf-builder" class="form-input" value="${p.builder||''}"></div></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Total Units</label><input id="pf-units" class="form-input" type="number" value="${p.units||0}"></div><div class="form-group"><label class="form-label">Available</label><input id="pf-available" class="form-input" type="number" value="${p.available||0}"></div></div>
+    <div class="form-group"><label class="form-label">Description</label><textarea id="pf-description" class="form-input">${p.description||''}</textarea></div>
+    <div class="form-group"><label class="form-label">Amenities</label><input id="pf-amenities" class="form-input" value="${p.amenities||''}"></div>`;
+}
+
 function viewProperty(id){
   const p=propertiesDB.find(x=>x.id===id);
+  const imageMarkup = p.image ? `<div style="text-align:center;background:var(--bg3);border-radius:8px;padding:12px;margin-bottom:16px"><img src="${p.image}" alt="${p.name}" style="width:100%;max-height:240px;object-fit:cover;border-radius:8px"></div>` : `<div style="text-align:center;background:var(--bg3);border-radius:8px;padding:30px;margin-bottom:16px;font-size:60px">${getPropertyTypeIcon(p.type)}</div>`;
   const body=`
-    <div style="text-align:center;background:var(--bg3);border-radius:8px;padding:30px;margin-bottom:16px;font-size:60px">${{Apartment:'🏢',Villa:'🏡',Plot:'🌿',Commercial:'🏬'}[p.type]||'🏠'}</div>
+    ${imageMarkup}
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
       <div><div style="font-size:20px;font-weight:600">${p.name}</div><div style="color:var(--text3);font-size:13px"><i class="fa-solid fa-location-dot"></i> ${p.location}</div></div>
       <span class="status-tag ${p.status==='Active'?'s-won':'s-sitevisit'}">${p.status}</span>
@@ -1401,14 +1582,103 @@ function viewProperty(id){
   showModal(p.name, body, null);
 }
 
+function deleteProperty(id){
+  if(!confirm('Delete this property?')) return;
+  propertiesDB = propertiesDB.filter(p => p.id !== id);
+  renderProperties();
+  showToast('Property deleted','success');
+}
+
+function openEditProperty(id){
+  const p = propertiesDB.find(x => x.id === id);
+  if(!p){
+    showToast('Property not found','error');
+    return;
+  }
+  showModal('Edit Property', propertyFormHTML(p), ()=>savePropertyEdit(id));
+}
+
+function savePropertyEdit(id){
+  const p = propertiesDB.find(x => x.id === id);
+  if(!p){
+    showToast('Property not found','error');
+    return;
+  }
+
+  const imageValue = document.getElementById('pf-image-remove').value === '1' ? '' : document.getElementById('pf-image-value').value.trim();
+  if(!isValidPropertyImage(imageValue)){
+    showToast('Image must be png, jpg, svg, webp, or avif','error');
+    return;
+  }
+
+  p.name = document.getElementById('pf-name').value.trim() || p.name;
+  p.type = document.getElementById('pf-type').value;
+  p.image = imageValue;
+  p.location = document.getElementById('pf-location').value.trim() || p.location;
+  p.config = document.getElementById('pf-config').value.trim() || p.config;
+  p.price = document.getElementById('pf-price').value.trim() || p.price;
+  p.status = document.getElementById('pf-status').value;
+  p.builder = document.getElementById('pf-builder').value.trim() || p.builder;
+  p.units = parseInt(document.getElementById('pf-units').value, 10) || p.units;
+  p.available = parseInt(document.getElementById('pf-available').value, 10) || p.available;
+  p.description = document.getElementById('pf-description').value.trim() || p.description;
+  p.amenities = document.getElementById('pf-amenities').value.trim() || p.amenities;
+
+  renderProperties();
+  closeModal();
+  showToast('Property updated','success');
+}
+
 function openAddProperty(){
   showModal('Add Property',`
-    <div class="form-row"><div class="form-group"><label class="form-label">Property Name</label><input class="form-input" placeholder="e.g. Aarovia Heights"></div><div class="form-group"><label class="form-label">Type</label><select class="form-input"><option>Apartment</option><option>Villa</option><option>Plot</option><option>Commercial</option></select></div></div>
-    <div class="form-group"><label class="form-label">Location</label><input class="form-input" placeholder="Area, City"></div>
-    <div class="form-row"><div class="form-group"><label class="form-label">Configuration</label><input class="form-input" placeholder="2BHK / 3BHK"></div><div class="form-group"><label class="form-label">Price Range</label><input class="form-input" placeholder="₹50L – ₹1Cr"></div></div>
-    <div class="form-group"><label class="form-label">Description</label><textarea class="form-input" placeholder="Project description..."></textarea></div>
-    <div class="form-group"><label class="form-label">Amenities</label><input class="form-input" placeholder="Pool, Gym, Clubhouse..."></div>`,
-  ()=>{showToast('Property added','success');closeModal()});
+    <div class="form-row"><div class="form-group"><label class="form-label">Property Name</label><input id="add-pf-name" class="form-input" placeholder="e.g. Aarovia Heights"></div><div class="form-group"><label class="form-label">Type</label><select id="add-pf-type" class="form-input"><option>Apartment</option><option>Villa</option><option>Plot</option><option>Commercial</option></select></div></div>
+    ${getAddPropertyPreviewMarkup()}
+    <div class="form-group">
+      <label class="form-label">Property Image</label>
+      <input id="add-pf-image-file" type="file" class="form-input" accept=".png,.jpg,.jpeg,.svg,.webp,.avif,image/png,image/jpeg,image/svg+xml,image/webp,image/avif" onchange="handlePropertyImageUpload(this, {previewId:'add-pf-preview', hiddenId:'add-pf-image-value', removeId:'add-pf-remove', fileId:'add-pf-image-file'})">
+      <div class="form-help">Upload PNG, JPG, SVG, WEBP, or AVIF. Leave blank for no image.</div>
+      <input type="hidden" id="add-pf-image-value" value="">
+      <input type="hidden" id="add-pf-remove" value="0">
+    </div>
+    <div class="form-group"><button type="button" class="btn btn-ghost btn-sm" onclick="clearPropertyImagePreview({previewId:'add-pf-preview', hiddenId:'add-pf-image-value', removeId:'add-pf-remove', fileId:'add-pf-image-file', fallbackType:'Apartment'})">Remove image</button></div>
+    <div class="form-group"><label class="form-label">Location</label><input id="add-pf-location" class="form-input" placeholder="Area, City"></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Configuration</label><input id="add-pf-config" class="form-input" placeholder="2BHK / 3BHK"></div><div class="form-group"><label class="form-label">Price Range</label><input id="add-pf-price" class="form-input" placeholder="₹50L – ₹1Cr"></div></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Status</label><select id="add-pf-status" class="form-input"><option>Active</option><option>Upcoming</option><option>Inactive</option></select></div><div class="form-group"><label class="form-label">Builder</label><input id="add-pf-builder" class="form-input" placeholder="Builder name"></div></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Total Units</label><input id="add-pf-units" class="form-input" type="number" value="1"></div><div class="form-group"><label class="form-label">Available</label><input id="add-pf-available" class="form-input" type="number" value="1"></div></div>
+    <div class="form-group"><label class="form-label">Description</label><textarea id="add-pf-description" class="form-input" placeholder="Project description..."></textarea></div>
+    <div class="form-group"><label class="form-label">Amenities</label><input id="add-pf-amenities" class="form-input" placeholder="Pool, Gym, Clubhouse..."></div>`,
+  ()=>{
+    const name = document.getElementById('add-pf-name').value.trim();
+    if(!name){
+      showToast('Please enter a property name','error');
+      return;
+    }
+
+    const imageValue = document.getElementById('add-pf-remove').value === '1' ? '' : document.getElementById('add-pf-image-value').value.trim();
+    if(!isValidPropertyImage(imageValue)){
+      showToast('Image must be png, jpg, svg, webp, or avif','error');
+      return;
+    }
+
+    propertiesDB.push({
+      id:'P'+Date.now().toString().slice(-6),
+      name,
+      type: document.getElementById('add-pf-type').value,
+      image: imageValue,
+      location: document.getElementById('add-pf-location').value.trim() || 'Location not specified',
+      config: document.getElementById('add-pf-config').value.trim() || 'Custom',
+      price: document.getElementById('add-pf-price').value.trim() || 'Price on request',
+      status: document.getElementById('add-pf-status').value,
+      units: parseInt(document.getElementById('add-pf-units').value,10) || 0,
+      available: parseInt(document.getElementById('add-pf-available').value,10) || 0,
+      builder: document.getElementById('add-pf-builder').value.trim() || 'Aarovia Constructions',
+      amenities: document.getElementById('add-pf-amenities').value.trim() || 'Contact sales team',
+      description: document.getElementById('add-pf-description').value.trim() || 'New property added from the CRM.'
+    });
+    renderProperties();
+    closeModal();
+    showToast('Property added','success');
+  });
 }
 
 // ==================== REPORTS ====================
@@ -1608,27 +1878,93 @@ function editUser(event, name){
 }
 
 // ==================== SETTINGS ====================
+const SETTINGS_STORAGE_KEY='aarovia-settings';
+const DEFAULT_SETTINGS={
+  company:{companyName:'Aarovia Real Estates',website:'www.aarovia.in',email:'info@aarovia.in',phone:'+91 44 1234 5678',address:'123 Anna Salai, Chennai, Tamil Nadu – 600002'},
+  whatsapp:{phoneNumberId:'123456789012345',businessAccountId:'987654321098765',accessToken:'EAABxxxxxxxx',verifyToken:'aarovia_webhook_2026'},
+  email:{smtpHost:'smtp.gmail.com',port:'587',username:'noreply@aarovia.in',password:'xxxx'},
+  notifications:{whatsappNotifications:true,emailNotifications:true,browserNotifications:true,overdueFollowupAlerts:true,newLeadAlerts:true,dealWonCelebrations:true}
+};
+
+function loadSettings(){
+  try {
+    const raw=localStorage.getItem(SETTINGS_STORAGE_KEY);
+    if(!raw) return JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+    const parsed=JSON.parse(raw);
+    return {
+      company:{...DEFAULT_SETTINGS.company, ...(parsed.company||{})},
+      whatsapp:{...DEFAULT_SETTINGS.whatsapp, ...(parsed.whatsapp||{})},
+      email:{...DEFAULT_SETTINGS.email, ...(parsed.email||{})},
+      notifications:{...DEFAULT_SETTINGS.notifications, ...(parsed.notifications||{})}
+    };
+  } catch {
+    return JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+  }
+}
+
+function saveSettings(section){
+  const current=loadSettings();
+  if(section==='company'){
+    current.company={
+      companyName:document.getElementById('settings-company-name')?.value || DEFAULT_SETTINGS.company.companyName,
+      website:document.getElementById('settings-company-website')?.value || DEFAULT_SETTINGS.company.website,
+      email:document.getElementById('settings-company-email')?.value || DEFAULT_SETTINGS.company.email,
+      phone:document.getElementById('settings-company-phone')?.value || DEFAULT_SETTINGS.company.phone,
+      address:document.getElementById('settings-company-address')?.value || DEFAULT_SETTINGS.company.address
+    };
+  }
+  if(section==='whatsapp'){
+    current.whatsapp={
+      phoneNumberId:document.getElementById('settings-whatsapp-phone-id')?.value || DEFAULT_SETTINGS.whatsapp.phoneNumberId,
+      businessAccountId:document.getElementById('settings-whatsapp-business-id')?.value || DEFAULT_SETTINGS.whatsapp.businessAccountId,
+      accessToken:document.getElementById('settings-whatsapp-access-token')?.value || DEFAULT_SETTINGS.whatsapp.accessToken,
+      verifyToken:document.getElementById('settings-whatsapp-verify-token')?.value || DEFAULT_SETTINGS.whatsapp.verifyToken
+    };
+  }
+  if(section==='email'){
+    current.email={
+      smtpHost:document.getElementById('settings-email-host')?.value || DEFAULT_SETTINGS.email.smtpHost,
+      port:document.getElementById('settings-email-port')?.value || DEFAULT_SETTINGS.email.port,
+      username:document.getElementById('settings-email-username')?.value || DEFAULT_SETTINGS.email.username,
+      password:document.getElementById('settings-email-password')?.value || DEFAULT_SETTINGS.email.password
+    };
+  }
+  if(section==='notifications'){
+    current.notifications={
+      whatsappNotifications:document.getElementById('settings-notify-whatsapp')?.checked ?? DEFAULT_SETTINGS.notifications.whatsappNotifications,
+      emailNotifications:document.getElementById('settings-notify-email')?.checked ?? DEFAULT_SETTINGS.notifications.emailNotifications,
+      browserNotifications:document.getElementById('settings-notify-browser')?.checked ?? DEFAULT_SETTINGS.notifications.browserNotifications,
+      overdueFollowupAlerts:document.getElementById('settings-notify-overdue')?.checked ?? DEFAULT_SETTINGS.notifications.overdueFollowupAlerts,
+      newLeadAlerts:document.getElementById('settings-notify-new-leads')?.checked ?? DEFAULT_SETTINGS.notifications.newLeadAlerts,
+      dealWonCelebrations:document.getElementById('settings-notify-won')?.checked ?? DEFAULT_SETTINGS.notifications.dealWonCelebrations
+    };
+  }
+  localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(current));
+  return current;
+}
+
 function showSettings(type,btn){
   document.querySelectorAll('#page-settings .nav-item').forEach(b=>b.classList.remove('active'));
   if(btn)btn.classList.add('active');
+  const settings=loadSettings();
   const content={
     company:`<div class="card"><div class="card-title">Company Profile</div>
-      <div class="form-row"><div class="form-group"><label class="form-label">Company Name</label><input class="form-input" value="Aarovia Real Estates"></div><div class="form-group"><label class="form-label">Website</label><input class="form-input" value="www.aarovia.in"></div></div>
-      <div class="form-row"><div class="form-group"><label class="form-label">Email</label><input class="form-input" value="info@aarovia.in"></div><div class="form-group"><label class="form-label">Phone</label><input class="form-input" value="+91 44 1234 5678"></div></div>
-      <div class="form-group"><label class="form-label">Address</label><textarea class="form-input">123 Anna Salai, Chennai, Tamil Nadu – 600002</textarea></div>
-      <div style="margin-top:12px"><button class="btn btn-primary" onclick="showToast('Settings saved','success')"><i class="fa-solid fa-save"></i> Save Changes</button></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">Company Name</label><input id="settings-company-name" class="form-input" value="${settings.company.companyName}"></div><div class="form-group"><label class="form-label">Website</label><input id="settings-company-website" class="form-input" value="${settings.company.website}"></div></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">Email</label><input id="settings-company-email" class="form-input" value="${settings.company.email}"></div><div class="form-group"><label class="form-label">Phone</label><input id="settings-company-phone" class="form-input" value="${settings.company.phone}"></div></div>
+      <div class="form-group"><label class="form-label">Address</label><textarea id="settings-company-address" class="form-input">${settings.company.address}</textarea></div>
+      <div style="margin-top:12px"><button class="btn btn-primary" onclick="saveSettings('company'); showToast('Company settings saved','success')"><i class="fa-solid fa-save"></i> Save Changes</button></div>
     </div>`,
     whatsapp:`<div class="card"><div class="card-title">WhatsApp Business API</div>
-      <div class="form-group"><label class="form-label">Phone Number ID</label><input class="form-input" value="123456789012345"></div>
-      <div class="form-group"><label class="form-label">WhatsApp Business Account ID</label><input class="form-input" value="987654321098765"></div>
-      <div class="form-group"><label class="form-label">Access Token</label><input class="form-input" type="password" value="EAABxxxxxxxx"></div>
-      <div class="form-group"><label class="form-label">Webhook Verify Token</label><input class="form-input" value="aarovia_webhook_2026"></div>
-      <div style="margin-top:12px;display:flex;gap:8px"><button class="btn btn-primary" onclick="showToast('API config saved','success')"><i class="fa-solid fa-save"></i> Save</button><button class="btn" onclick="showToast('Connection test: success ✓','success')"><i class="fa-solid fa-plug"></i> Test Connection</button></div>
+      <div class="form-group"><label class="form-label">Phone Number ID</label><input id="settings-whatsapp-phone-id" class="form-input" value="${settings.whatsapp.phoneNumberId}"></div>
+      <div class="form-group"><label class="form-label">WhatsApp Business Account ID</label><input id="settings-whatsapp-business-id" class="form-input" value="${settings.whatsapp.businessAccountId}"></div>
+      <div class="form-group"><label class="form-label">Access Token</label><input id="settings-whatsapp-access-token" class="form-input" type="password" value="${settings.whatsapp.accessToken}"></div>
+      <div class="form-group"><label class="form-label">Webhook Verify Token</label><input id="settings-whatsapp-verify-token" class="form-input" value="${settings.whatsapp.verifyToken}"></div>
+      <div style="margin-top:12px;display:flex;gap:8px"><button class="btn btn-primary" onclick="saveSettings('whatsapp'); showToast('WhatsApp settings saved','success')"><i class="fa-solid fa-save"></i> Save</button><button class="btn" onclick="showToast('Connection test: success ✓','success')"><i class="fa-solid fa-plug"></i> Test Connection</button></div>
     </div>`,
     email:`<div class="card"><div class="card-title">Email SMTP Configuration</div>
-      <div class="form-row"><div class="form-group"><label class="form-label">SMTP Host</label><input class="form-input" value="smtp.gmail.com"></div><div class="form-group"><label class="form-label">Port</label><input class="form-input" value="587"></div></div>
-      <div class="form-row"><div class="form-group"><label class="form-label">Username</label><input class="form-input" value="noreply@aarovia.in"></div><div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" value="xxxx"></div></div>
-      <div style="margin-top:12px;display:flex;gap:8px"><button class="btn btn-primary" onclick="showToast('SMTP config saved','success')">Save</button><button class="btn" onclick="showToast('Test email sent!','success')">Send Test Email</button></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">SMTP Host</label><input id="settings-email-host" class="form-input" value="${settings.email.smtpHost}"></div><div class="form-group"><label class="form-label">Port</label><input id="settings-email-port" class="form-input" value="${settings.email.port}"></div></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">Username</label><input id="settings-email-username" class="form-input" value="${settings.email.username}"></div><div class="form-group"><label class="form-label">Password</label><input id="settings-email-password" class="form-input" type="password" value="${settings.email.password}"></div></div>
+      <div style="margin-top:12px;display:flex;gap:8px"><button class="btn btn-primary" onclick="saveSettings('email'); showToast('SMTP settings saved','success')">Save</button><button class="btn" onclick="showToast('Test email sent!','success')">Send Test Email</button></div>
     </div>`,
     pipeline:`<div class="card"><div class="card-title">Pipeline Stage Configuration</div>
       <div style="display:flex;flex-direction:column;gap:8px">${STATUSES.map((s,i)=>`
@@ -1651,16 +1987,58 @@ function showSettings(type,btn){
       <button class="btn btn-sm" style="margin-top:12px" onclick="showToast('Source added','success')"><i class="fa-solid fa-plus"></i> Add Source</button>
     </div>`,
     notifications:`<div class="card"><div class="card-title">Notification Preferences</div>
-      ${[['WhatsApp Notifications','Get follow-up reminders on WhatsApp'],['Email Notifications','Daily summary and lead alerts'],['Browser Notifications','Real-time lead and task notifications'],['Overdue Follow-up Alerts','Alert when follow-ups are missed'],['New Lead Alerts','Notify when a new lead is assigned'],['Deal Won Celebrations','Team notification when a deal is closed']].map(([t,s])=>`
+      <div style="display:flex;flex-direction:column;gap:0">
         <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)">
-          <div><div style="font-size:13px;font-weight:500">${t}</div><div style="font-size:12px;color:var(--text3)">${s}</div></div>
+          <div><div style="font-size:13px;font-weight:500">WhatsApp Notifications</div><div style="font-size:12px;color:var(--text3)">Get follow-up reminders on WhatsApp</div></div>
           <label style="position:relative;display:inline-block;width:40px;height:22px;cursor:pointer">
-            <input type="checkbox" checked style="opacity:0;width:0;height:0" onchange="showToast('Preference updated','info')">
+            <input id="settings-notify-whatsapp" type="checkbox" ${settings.notifications.whatsappNotifications?'checked':''} style="opacity:0;width:0;height:0" onchange="saveSettings('notifications'); showToast('Preference updated','info')">
             <span style="position:absolute;inset:0;background:var(--accent);border-radius:22px;transition:.3s"></span>
             <span style="position:absolute;left:3px;top:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:.3s"></span>
           </label>
-        </div>`).join('')}
-    </div>`,
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)">
+          <div><div style="font-size:13px;font-weight:500">Email Notifications</div><div style="font-size:12px;color:var(--text3)">Daily summary and lead alerts</div></div>
+          <label style="position:relative;display:inline-block;width:40px;height:22px;cursor:pointer">
+            <input id="settings-notify-email" type="checkbox" ${settings.notifications.emailNotifications?'checked':''} style="opacity:0;width:0;height:0" onchange="saveSettings('notifications'); showToast('Preference updated','info')">
+            <span style="position:absolute;inset:0;background:var(--accent);border-radius:22px;transition:.3s"></span>
+            <span style="position:absolute;left:3px;top:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:.3s"></span>
+          </label>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)">
+          <div><div style="font-size:13px;font-weight:500">Browser Notifications</div><div style="font-size:12px;color:var(--text3)">Real-time lead and task notifications</div></div>
+          <label style="position:relative;display:inline-block;width:40px;height:22px;cursor:pointer">
+            <input id="settings-notify-browser" type="checkbox" ${settings.notifications.browserNotifications?'checked':''} style="opacity:0;width:0;height:0" onchange="saveSettings('notifications'); showToast('Preference updated','info')">
+            <span style="position:absolute;inset:0;background:var(--accent);border-radius:22px;transition:.3s"></span>
+            <span style="position:absolute;left:3px;top:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:.3s"></span>
+          </label>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)">
+          <div><div style="font-size:13px;font-weight:500">Overdue Follow-up Alerts</div><div style="font-size:12px;color:var(--text3)">Alert when follow-ups are missed</div></div>
+          <label style="position:relative;display:inline-block;width:40px;height:22px;cursor:pointer">
+            <input id="settings-notify-overdue" type="checkbox" ${settings.notifications.overdueFollowupAlerts?'checked':''} style="opacity:0;width:0;height:0" onchange="saveSettings('notifications'); showToast('Preference updated','info')">
+            <span style="position:absolute;inset:0;background:var(--accent);border-radius:22px;transition:.3s"></span>
+            <span style="position:absolute;left:3px;top:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:.3s"></span>
+          </label>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)">
+          <div><div style="font-size:13px;font-weight:500">New Lead Alerts</div><div style="font-size:12px;color:var(--text3)">Notify when a new lead is assigned</div></div>
+          <label style="position:relative;display:inline-block;width:40px;height:22px;cursor:pointer">
+            <input id="settings-notify-new-leads" type="checkbox" ${settings.notifications.newLeadAlerts?'checked':''} style="opacity:0;width:0;height:0" onchange="saveSettings('notifications'); showToast('Preference updated','info')">
+            <span style="position:absolute;inset:0;background:var(--accent);border-radius:22px;transition:.3s"></span>
+            <span style="position:absolute;left:3px;top:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:.3s"></span>
+          </label>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0">
+          <div><div style="font-size:13px;font-weight:500">Deal Won Celebrations</div><div style="font-size:12px;color:var(--text3)">Team notification when a deal is closed</div></div>
+          <label style="position:relative;display:inline-block;width:40px;height:22px;cursor:pointer">
+            <input id="settings-notify-won" type="checkbox" ${settings.notifications.dealWonCelebrations?'checked':''} style="opacity:0;width:0;height:0" onchange="saveSettings('notifications'); showToast('Preference updated','info')">
+            <span style="position:absolute;inset:0;background:var(--accent);border-radius:22px;transition:.3s"></span>
+            <span style="position:absolute;left:3px;top:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:.3s"></span>
+          </label>
+        </div>
+      </div>
+      <div style="margin-top:12px"><button class="btn btn-primary" onclick="saveSettings('notifications'); showToast('Notification preferences saved','success')">Save Preferences</button></div>
+    </div>`
   };
   document.getElementById('settings-content').innerHTML=content[type]||'<div class="card">Coming soon</div>';
 }
