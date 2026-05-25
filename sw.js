@@ -1,10 +1,9 @@
 // Aarovia CRM – Service Worker v1.0
 const CACHE_NAME = 'aarovia-crm-v1';
 const STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  '/login.html',
-  '/quotation.html',
+  '/index',
+  '/login',
+  '/quotation',
   '/manifest.json',
 ];
 

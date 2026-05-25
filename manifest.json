@@ -2,7 +2,7 @@
   "name": "Aarovia Real Estates CRM",
   "short_name": "Aarovia CRM",
   "description": "Complete CRM system for Aarovia Real Estates – manage leads, pipeline, quotations and WhatsApp communication",
-  "start_url": "/login.html",
+  "start_url": "/login",
   "display": "standalone",
   "background_color": "#0e0f11",
   "theme_color": "#4f8ef7",
@@ -25,21 +25,21 @@
       "name": "Add New Lead",
       "short_name": "New Lead",
       "description": "Quickly add a new lead",
-      "url": "/index.html#new-lead",
+      "url": "/index#new-lead",
       "icons": [{ "src": "icons/shortcut-lead.png", "sizes": "96x96" }]
     },
     {
       "name": "Pipeline Board",
       "short_name": "Pipeline",
       "description": "View the Kanban pipeline",
-      "url": "/index.html#pipeline",
+      "url": "/index#pipeline",
       "icons": [{ "src": "icons/shortcut-pipeline.png", "sizes": "96x96" }]
     },
     {
       "name": "Today's Follow-ups",
       "short_name": "Follow-ups",
       "description": "See today's scheduled follow-ups",
-      "url": "/index.html#followups",
+      "url": "/index#followups",
       "icons": [{ "src": "icons/shortcut-followup.png", "sizes": "96x96" }]
     }
   ]

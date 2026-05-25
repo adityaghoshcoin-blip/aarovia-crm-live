@@ -8,9 +8,9 @@ A complete, enterprise-grade CRM system built for Aarovia Real Estates to manage
 
 ```
 aarovia-crm/
-├── index.html          ← Main CRM dashboard (all modules)
-├── login.html          ← Authentication page (email + OTP)
-├── quotation.html      ← Standalone quotation generator
+├── index               ← Main CRM dashboard (all modules)
+├── login               ← Authentication page (email + OTP)
+├── quotation           ← Standalone quotation generator
 ├── manifest.json       ← PWA manifest
 ├── sw.js               ← Service worker (offline + push notifications)
 └── README.md           ← This file
@@ -21,7 +21,7 @@ aarovia-crm/
 ## 🚀 Getting Started
 
 ### Option 1 – Open directly
-Just open `login.html` in any modern browser. No build step required.
+Just open `login` in any modern browser. No build step required.
 
 ### Option 2 – Local server (recommended for PWA)
 ```bash
@@ -32,7 +32,7 @@ python3 -m http.server 3000
 npx serve .
 
 # Then visit:
-http://localhost:3000/login.html
+http://localhost:3000/login
 ```
 
 ### Demo Credentials
@@ -47,14 +47,14 @@ http://localhost:3000/login.html
 
 ## 📦 Modules
 
-### 1. Authentication (`login.html`)
+### 1. Authentication (`login`)
 - Email + password login
 - Mobile OTP login
 - Role-based quick login (demo)
 - Password reset flow
 - Session persistence
 
-### 2. Dashboard (`index.html → Dashboard`)
+### 2. Dashboard (`index → Dashboard`)
 - Total leads, conversion rate, site visits, pipeline value
 - Recent leads table
 - Lead source breakdown chart
@@ -62,7 +62,7 @@ http://localhost:3000/login.html
 - Today's follow-ups with overdue alerts
 - Live activity feed
 
-### 3. Lead Management (`index.html → Leads`)
+### 3. Lead Management (`index → Leads`)
 - Full lead table with 11 columns
 - Multi-filter: source, status, executive, search
 - Add / Edit / Delete leads
@@ -71,21 +71,21 @@ http://localhost:3000/login.html
 - Lead scoring (0–100)
 - Auto lead ID generation (ARV-XXXX)
 
-### 4. Pipeline Board (`index.html → Pipeline`)
+### 4. Pipeline Board (`index → Pipeline`)
 - 10-stage Kanban board
 - Drag-and-drop between stages (HTML5 DnD)
 - Color-coded stage indicators
 - Per-stage lead count
 - Filter by executive
 
-### 5. Follow-ups (`index.html → Follow-ups`)
+### 5. Follow-ups (`index → Follow-ups`)
 - Overdue / Today / Upcoming tabs
 - Mark complete
 - Schedule new follow-up
 - Call / WhatsApp quick actions
 - Color-coded urgency (red = overdue)
 
-### 6. Quotation Generator (`quotation.html` + `index.html → Quotations`)
+### 6. Quotation Generator (`quotation` + `index → Quotations`)
 - Full form with customer, property, pricing
 - Additional charges (parking, membership, etc.)
 - Live PDF preview with watermark for drafts
@@ -96,39 +96,39 @@ http://localhost:3000/login.html
 - Print / Download / WhatsApp / Email
 - Quotation status tracking (Draft → Sent → Accepted)
 
-### 7. WhatsApp Panel (`index.html → WhatsApp`)
+### 7. WhatsApp Panel (`index → WhatsApp`)
 - Contact list with last message preview
 - Full chat interface (sent/received bubbles)
 - Quick templates (Welcome, Site Visit, Follow-up, Quotation)
 - Type and send messages
 - Send quotation from chat
 
-### 8. Properties (`index.html → Properties`)
+### 8. Properties (`index → Properties`)
 - Property cards with emoji icons
 - Available units tracker
 - View property details (amenities, pricing, description)
 - Share brochure / WhatsApp share
 - Add new property form
 
-### 9. Reports & Analytics (`index.html → Reports`)
+### 9. Reports & Analytics (`index → Reports`)
 - Overview: KPI stats + source breakdown + pipeline funnel
 - Leads Report: Monthly trend bar chart
 - Team Performance: Per-executive table with conversion %
 - Pipeline: Stage-wise conversion visualization
 
-### 10. Campaigns (`index.html → Campaigns`)
+### 10. Campaigns (`index → Campaigns`)
 - Campaign table: leads, conversions, budget, cost/lead
 - Source-tagged campaigns
 - Active / Paused / Completed status
 - Add new campaign form
 
-### 11. Team Management (`index.html → Team`)
+### 11. Team Management (`index → Team`)
 - Team member cards with avatar, role, contact
 - Leads assigned, closed, conversion rate
 - Add / Edit user form
 - Role display (Admin, Manager, Executive, Telecaller)
 
-### 12. Settings (`index.html → Settings`)
+### 12. Settings (`index → Settings`)
 - Company Profile
 - WhatsApp Business API config
 - Email SMTP config
@@ -409,7 +409,4 @@ server {
 
 ## 📞 Support
 
-For implementation queries, contact the Aarovia IT team at tech@aarovia.co.in
-
-
-updated crm files
+For implementation queries, contact the Aarovia IT team at tech@aarovia.in
